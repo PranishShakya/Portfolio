@@ -1,0 +1,8 @@
+@import "tailwindcss";
+
+html,body{
+    font-family: "Bitcount Grid Single", sans-serif;
+    background-color: black;
+    scroll-behavior: smooth;
+     scroll-padding-top: 85px;
+}
