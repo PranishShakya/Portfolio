@@ -1,8 +1,49 @@
 @import "tailwindcss";
 
 html,body{
-    font-family: "Bitcount Grid Single", sans-serif;
+    font-family: "Poppins", "Bitcount Grid Single", sans-serif;
     background-color: black;
     scroll-behavior: smooth;
-     scroll-padding-top: 85px;
+    scroll-padding-top: 80px;
 }
+
+/* Modern subtle orange background grid */
+.bg-grid-pattern {
+  background-size: 55px 55px;
+  background-image: 
+    linear-gradient(to right, rgba(249, 115, 22, 0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(249, 115, 22, 0.02) 1px, transparent 1px);
+}
+
+/* Floating animation for graphics */
+@keyframes float {
+  0% { transform: translateY(0px) scale(1); }
+  50% { transform: translateY(-12px) scale(1.05); }
+  100% { transform: translateY(0px) scale(1); }
+}
+
+.animate-float {
+  animation: float 8s ease-in-out infinite;
+}
+
+/* Slowly rotating animation */
+@keyframes rotateSlow {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.animate-rotate-slow {
+  animation: rotateSlow 25s linear infinite;
+}
+
+/* Hide default cursor on desktop screens to showcase the custom cursor */
+@media (pointer: fine) {
+  html, body {
+    cursor: none;
+  }
+  
+  a, button, input, select, textarea, label, [role="button"], .cursor-pointer {
+    cursor: none !important;
+  }
+}
+

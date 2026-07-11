@@ -1,57 +1,96 @@
-
+import React, { useState, useEffect } from "react";
 import Picture from "../Pictures";
+import { getResume } from "../../utils/portfolioStorage";
 
 const BodyTitle = () => {
+  const [resumeUrl, setResumeUrl] = useState("CV.pdf");
+
+  const updateResumeLink = () => {
+    const customResume = getResume();
+    if (customResume) {
+      // Ensure the string has the data URI prefix
+      setResumeUrl(customResume.startsWith("data:") ? customResume : `data:application/pdf;base64,${customResume}`);
+    } else {
+      setResumeUrl("CV.pdf");
+    }
+  };
+
+  useEffect(() => {
+    updateResumeLink();
+    window.addEventListener("portfolio-resume-updated", updateResumeLink);
+    return () => {
+      window.removeEventListener("portfolio-resume-updated", updateResumeLink);
+    };
+  }, []);
+
   return (
-    <>
-      <div className="min-h-screen pt-20">
-        <div className="text-white text-5xl pt-30 px-25 font-bold">
-          <h1>Hello.</h1>
-        </div>
-        <div className="flex items-center gap-4 pt-5">
-          <div className="w-30 h-0.5 bg-orange-400"></div>
-          <h1 className="text-white text-4xl font-semibold">
-            I’m Pranish Shakya
-          </h1>
-        </div>
+    <div className="max-w-7xl mx-auto px-6 md:px-12 w-full pt-20 md:pt-24 pb-8">
+      <div className="flex flex-col-reverse md:flex-row items-center justify-between gap-8 lg:gap-12">
+        {/* Left Column: Intro text */}
+        <div className="w-full md:w-3/5 text-left flex flex-col justify-center">
+          <div className="text-orange-500 font-bold text-lg mb-2 uppercase tracking-widest">
+            Hello, Welcome
+          </div>
+          
+          <div className="text-white text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight mb-4">
+            I'm <span className="text-orange-500">Pranish Shakya</span>
+          </div>
 
-        <div className="text-white text-5xl pt-5 px-25 font-bold">
-          <h1>Software Developer</h1>
-        </div>
-        <div className="flex text-white gap-7 pt-20 px-25 text-20 pb-20 ">
-          <button className="border pl-2 pr-2 h-8 bg-orange-500 cursor-pointer">
-            Got a Project?
-          </button>
-          <a href="CV.pdf" type="button" className="border pt-1 text-white pl-2 pr-2 h-8 cursor-pointer transition-all duration-300 hover:bg-white hover:text-black">
-            Resume
-          </a>
-        </div>
-        <div className="flex relative justify-end">
-          <Picture />
-        </div>
+          <div className="text-gray-300 text-2xl sm:text-3xl font-semibold mb-6">
+            Software Developer
+          </div>
+          
+          <p className="text-gray-400 text-lg max-w-xl mb-8 leading-relaxed">
+            I craft high-performance, beautiful, and accessible web solutions. Specialize in ASP.NET Core, React ecosystem, and robust database architectures.
+          </p>
 
-        <div className=" container m-auto">
-          <div className=" flex  bg-gray-900 h-14  items-center justify-center">
-            {[
-              "HTML",
-              "CSS",
-              "React",
-              "Asp.Net(MVC)",
-              "JavaScript",
-              "GitHub",
-            ].map((tech) => (
-              <p key={tech} className="text-gray-500 px-10 text-2xl">
-                {tech}
-              </p>
-            ))}
+          <div className="flex items-center flex-wrap gap-4 mb-6">
+            <a 
+              href="#contact"
+              className="px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-orange-500/20 transition-all duration-300 transform hover:-translate-y-0.5 cursor-pointer text-center"
+            >
+              Got a Project?
+            </a>
+            
+            <a 
+              href={resumeUrl}
+              download="Pranish_Shakya_CV.pdf"
+              className="px-6 py-3 border border-gray-600 hover:border-orange-500 text-white hover:text-orange-500 font-semibold rounded-lg transition-all duration-300 transform hover:-translate-y-0.5 cursor-pointer text-center"
+            >
+              Download Resume
+            </a>
           </div>
         </div>
 
-
+        {/* Right Column: Profile Picture with Solar System */}
+        <div className="w-full md:w-1/2 flex justify-center items-center overflow-visible py-10 md:py-0">
+          <Picture />
+        </div>
       </div>
-      
-    </>
+
+      {/* Tech Stack Horizontal Carousel / Bar */}
+      <div className="mt-6 border-t border-b border-gray-800 py-4 bg-gray-900/30 rounded-xl px-4 overflow-hidden">
+        <div className="flex flex-wrap justify-center gap-6 md:gap-12 items-center">
+          {[
+            "HTML5",
+            "CSS3",
+            "React",
+            "ASP.NET MVC",
+            "JavaScript",
+            "GitHub",
+          ].map((tech) => (
+            <span 
+              key={tech} 
+              className="text-gray-500 hover:text-orange-500/80 font-bold text-xl md:text-2xl tracking-wider transition-colors duration-300"
+            >
+              {tech}
+            </span>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 };
 
 export default BodyTitle;
+
