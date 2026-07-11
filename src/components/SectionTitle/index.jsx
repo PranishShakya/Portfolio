@@ -8,8 +8,12 @@ const BodyTitle = () => {
   const updateResumeLink = () => {
     const customResume = getResume();
     if (customResume) {
-      // Ensure the string has the data URI prefix
-      setResumeUrl(customResume.startsWith("data:") ? customResume : `data:application/pdf;base64,${customResume}`);
+      // Ensure the string has the data URI prefix or is an HTTP/HTTPS URL
+      setResumeUrl(
+        customResume.startsWith("data:") || customResume.startsWith("http")
+          ? customResume
+          : `data:application/pdf;base64,${customResume}`
+      );
     } else {
       setResumeUrl("CV.pdf");
     }

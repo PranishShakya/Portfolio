@@ -1,3 +1,16 @@
+import { db, storage, auth, isFirebaseConfigured } from "../firebase";
+import {
+  collection,
+  getDocs,
+  doc,
+  setDoc,
+  deleteDoc,
+  query,
+  orderBy,
+} from "firebase/firestore";
+import { ref, uploadString, getDownloadURL } from "firebase/storage";
+import { signInAnonymously } from "firebase/auth";
+
 // Default projects for Pranish Shakya's portfolio
 const DEFAULT_PROJECTS = [
   {
@@ -32,6 +45,17 @@ const DEFAULT_PROJECTS = [
 const RESUME_KEY = "pranish_portfolio_resume";
 const PROJECTS_KEY = "pranish_portfolio_projects";
 
+// Ensure Firebase is anonymously authenticated when performing write operations
+const ensureAuth = async () => {
+  if (isFirebaseConfigured && auth && !auth.currentUser) {
+    try {
+      await signInAnonymously(auth);
+    } catch (e) {
+      console.error("Firebase Anonymous Auth failed:", e);
+    }
+  }
+};
+
 export const getResume = () => {
   try {
     return localStorage.getItem(RESUME_KEY) || "";
@@ -46,11 +70,34 @@ export const saveResume = (base64Data) => {
     localStorage.setItem(RESUME_KEY, base64Data);
     // Dispatch custom event to notify other components
     window.dispatchEvent(new Event("portfolio-resume-updated"));
-    return true;
   } catch (e) {
     console.error("Failed to save resume to localStorage:", e);
     return false;
   }
+
+  // Push to Firebase in background if configured
+  if (isFirebaseConfigured && storage && db) {
+    ensureAuth().then(async () => {
+      try {
+        const storageRef = ref(storage, "resumes/resume.pdf");
+        const uploadResult = await uploadString(storageRef, base64Data, "data_url");
+        const downloadUrl = await getDownloadURL(uploadResult.ref);
+        
+        await setDoc(doc(db, "cv", "latest"), {
+          url: downloadUrl,
+          updatedAt: new Date().toISOString(),
+        });
+        
+        // Save the URL to localStorage to prevent quota issues
+        localStorage.setItem(RESUME_KEY, downloadUrl);
+        window.dispatchEvent(new Event("portfolio-resume-updated"));
+      } catch (err) {
+        console.error("Error uploading CV to Firebase:", err);
+      }
+    });
+  }
+
+  return true;
 };
 
 export const getProjects = () => {
@@ -77,24 +124,65 @@ export const saveProjects = (projects) => {
 
 export const addProject = (project) => {
   const projects = getProjects();
+  const id = `project-${Date.now()}`;
   const newProject = {
     ...project,
-    id: `project-${Date.now()}`
+    id
   };
   const updated = [newProject, ...projects];
-  return saveProjects(updated);
+  
+  const success = saveProjects(updated);
+
+  if (success && isFirebaseConfigured && db) {
+    ensureAuth().then(async () => {
+      try {
+        await setDoc(doc(db, "projects", id), project);
+      } catch (e) {
+        console.error("Error saving new project to Firebase:", e);
+      }
+    });
+  }
+
+  return success;
 };
 
 export const updateProject = (updatedProject) => {
   const projects = getProjects();
   const updated = projects.map(p => p.id === updatedProject.id ? updatedProject : p);
-  return saveProjects(updated);
+  
+  const success = saveProjects(updated);
+
+  if (success && isFirebaseConfigured && db) {
+    ensureAuth().then(async () => {
+      try {
+        const { id, ...data } = updatedProject;
+        await setDoc(doc(db, "projects", id), data);
+      } catch (e) {
+        console.error("Error updating project in Firebase:", e);
+      }
+    });
+  }
+
+  return success;
 };
 
 export const deleteProject = (id) => {
   const projects = getProjects();
   const updated = projects.filter(p => p.id !== id);
-  return saveProjects(updated);
+  
+  const success = saveProjects(updated);
+
+  if (success && isFirebaseConfigured && db) {
+    ensureAuth().then(async () => {
+      try {
+        await deleteDoc(doc(db, "projects", id));
+      } catch (e) {
+        console.error("Error deleting project from Firebase:", e);
+      }
+    });
+  }
+
+  return success;
 };
 
 export const resetPortfolio = () => {
@@ -109,3 +197,47 @@ export const resetPortfolio = () => {
     return false;
   }
 };
+
+// --- Firebase Sync Function ---
+export const syncFromFirebase = async () => {
+  if (!isFirebaseConfigured || !db) return;
+  try {
+    // 1. Fetch projects
+    const snapshot = await getDocs(collection(db, "projects"));
+    const projects = [];
+    snapshot.forEach((docSnap) => {
+      projects.push({
+        id: docSnap.id,
+        ...docSnap.data()
+      });
+    });
+
+    if (projects.length > 0) {
+      localStorage.setItem(PROJECTS_KEY, JSON.stringify(projects));
+      window.dispatchEvent(new Event("portfolio-projects-updated"));
+    }
+
+    // 2. Fetch CV
+    const cvSnapshot = await getDocs(collection(db, "cv"));
+    let cvUrl = "";
+    cvSnapshot.forEach((docSnap) => {
+      if (docSnap.id === "latest") {
+        cvUrl = docSnap.data().url;
+      }
+    });
+
+    if (cvUrl) {
+      localStorage.setItem(RESUME_KEY, cvUrl);
+      window.dispatchEvent(new Event("portfolio-resume-updated"));
+    }
+  } catch (e) {
+    console.error("Failed to sync data from Firebase:", e);
+  }
+};
+
+// Auto-trigger Firebase background synchronization on load
+if (typeof window !== "undefined") {
+  setTimeout(() => {
+    syncFromFirebase();
+  }, 100);
+}
