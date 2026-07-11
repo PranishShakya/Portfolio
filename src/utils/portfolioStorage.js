@@ -91,7 +91,11 @@ export const uploadToSupabase = async (base64Data, path) => {
   }
 
   const { data } = supabase.storage.from(SUPABASE_BUCKET).getPublicUrl(path);
-  return data?.publicUrl || null;
+  if (!data?.publicUrl) return null;
+
+  // Cache-bust: same path can be overwritten (upsert), so append a timestamp
+  // to force browsers/CDN to fetch the new version instead of a cached old one.
+  return `${data.publicUrl}?t=${Date.now()}`;
 };
 
 /**
@@ -125,8 +129,11 @@ export const subscribeToProjects = (callback) => {
   const unsubscribe = onSnapshot(
     q,
     (snapshot) => {
+      // Show whatever is actually in Firestore, even if empty (e.g. you
+      // deliberately deleted your last project). Defaults only apply when
+      // Firebase itself isn't configured (handled above, before this runs).
       const projects = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
-      callback(projects.length > 0 ? projects : DEFAULT_PROJECTS);
+      callback(projects);
     },
     (error) => {
       console.error("Error listening to projects:", error);
