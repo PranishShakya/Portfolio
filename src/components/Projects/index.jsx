@@ -1,14 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { FaGithub, FaExternalLinkAlt, FaTrash, FaEdit } from "react-icons/fa";
-import { getProjects, deleteProject } from "../../utils/portfolioStorage";
+import { subscribeToProjects, deleteProject } from "../../utils/portfolioStorage";
 
 const Projects = () => {
   const [projectsList, setProjectsList] = useState([]);
   const [isAdmin, setIsAdmin] = useState(false);
-
-  const loadProjects = () => {
-    setProjectsList(getProjects());
-  };
 
   const checkAdminMode = () => {
     try {
@@ -19,21 +15,21 @@ const Projects = () => {
   };
 
   useEffect(() => {
-    loadProjects();
+    // Subscribe to real-time Firestore updates
+    const unsubscribe = subscribeToProjects(setProjectsList);
     checkAdminMode();
 
-    window.addEventListener("portfolio-projects-updated", loadProjects);
     window.addEventListener("portfolio-admin-mode-updated", checkAdminMode);
 
     return () => {
-      window.removeEventListener("portfolio-projects-updated", loadProjects);
+      unsubscribe();
       window.removeEventListener("portfolio-admin-mode-updated", checkAdminMode);
     };
   }, []);
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this project?")) {
-      deleteProject(id);
+      await deleteProject(id);
     }
   };
 
@@ -166,4 +162,3 @@ const Projects = () => {
 };
 
 export default Projects;
-

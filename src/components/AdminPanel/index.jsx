@@ -117,10 +117,10 @@ const AdminPanel = () => {
     if (!file) return;
     if (file.type !== "application/pdf") { alert("Please upload a PDF file only."); return; }
     const reader = new FileReader();
-    reader.onload = (ev) => {
-      const success = saveResume(ev.target.result);
+    reader.onload = async (ev) => {
+      const success = await saveResume(ev.target.result);
       if (success) { alert("CV Resume uploaded successfully!"); if (resumeInputRef.current) resumeInputRef.current.value = ""; }
-      else alert("Failed to save CV (it might be too large).");
+      else alert("Failed to save CV. Make sure Firebase is configured.");
     };
     reader.readAsDataURL(file);
   };
@@ -133,17 +133,17 @@ const AdminPanel = () => {
     reader.readAsDataURL(file);
   };
 
-  const handleProjectSubmit = (e) => {
+  const handleProjectSubmit = async (e) => {
     e.preventDefault();
     if (!projectTitle || !projectDescription) { alert("Please enter a title and description."); return; }
     const techArray = projectTech ? projectTech.split(",").map((t) => t.trim()).filter(Boolean) : [];
     const projectData = { title: projectTitle, description: projectDescription, technologies: techArray, githubLink: projectGithub || "#", liveLink: projectLive || "#", image: projectImage };
     let success = false;
     if (editingProjectId) {
-      success = updateProject({ ...projectData, id: editingProjectId });
+      success = await updateProject({ ...projectData, id: editingProjectId });
       alert(success ? "Project updated successfully!" : "Failed to update project.");
     } else {
-      success = addProject(projectData);
+      success = await addProject(projectData);
       alert(success ? "Project added successfully!" : "Failed to add project.");
     }
     if (success) clearProjectForm();
@@ -155,10 +155,12 @@ const AdminPanel = () => {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  const handleReset = () => {
+  const handleReset = async () => {
     if (window.confirm("This will erase all custom uploads and restore the default portfolio projects and resume. Continue?")) {
-      resetPortfolio(); clearProjectForm(); toggleAdminMode(false);
-      alert("Portfolio reset to default state!"); setIsOpen(false);
+      const success = await resetPortfolio();
+      clearProjectForm(); toggleAdminMode(false);
+      alert(success ? "Portfolio reset to default state!" : "Reset failed. Check Firebase configuration.");
+      setIsOpen(false);
     }
   };
 

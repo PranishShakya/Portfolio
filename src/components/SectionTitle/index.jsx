@@ -1,30 +1,24 @@
 import React, { useState, useEffect } from "react";
 import Picture from "../Pictures";
-import { getResume } from "../../utils/portfolioStorage";
+import { subscribeToResume } from "../../utils/portfolioStorage";
 
 const BodyTitle = () => {
   const [resumeUrl, setResumeUrl] = useState("CV.pdf");
 
-  const updateResumeLink = () => {
-    const customResume = getResume();
-    if (customResume) {
-      // Ensure the string has the data URI prefix or is an HTTP/HTTPS URL
-      setResumeUrl(
-        customResume.startsWith("data:") || customResume.startsWith("http")
-          ? customResume
-          : `data:application/pdf;base64,${customResume}`
-      );
-    } else {
-      setResumeUrl("CV.pdf");
-    }
-  };
-
   useEffect(() => {
-    updateResumeLink();
-    window.addEventListener("portfolio-resume-updated", updateResumeLink);
-    return () => {
-      window.removeEventListener("portfolio-resume-updated", updateResumeLink);
-    };
+    const unsubscribe = subscribeToResume((url) => {
+      if (url) {
+        setResumeUrl(
+          url.startsWith("data:") || url.startsWith("http")
+            ? url
+            : `data:application/pdf;base64,${url}`
+        );
+      } else {
+        setResumeUrl("CV.pdf");
+      }
+    });
+
+    return () => unsubscribe();
   }, []);
 
   return (
