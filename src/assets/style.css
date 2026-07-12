@@ -73,7 +73,7 @@ body.light h6 {
   color: #0f172a !important;
 }
 
-body.light p {
+body.light p:not([style]) {
   color: #1e293b !important;
 }
 

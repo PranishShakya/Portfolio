@@ -56,7 +56,7 @@ const AboutPage = () => {
                 <h3 className="text-lg font-bold text-white mb-1 group-hover:text-orange-500 transition-colors">
                   {skill.title}
                 </h3>
-                <p className="text-gray-400 text-sm leading-relaxed">
+                <p style={{ color: 'inherit' }} className="text-gray-300 text-sm leading-relaxed">
                   {skill.description}
                 </p>
               </div>
@@ -68,14 +68,14 @@ const AboutPage = () => {
         <div className="space-y-8">
           
           {/* Bio Glassmorphic Card */}
-          <div className="bg-gray-900/40 backdrop-blur-md border border-gray-800/80 rounded-2xl p-8 shadow-xl relative overflow-hidden">
+          <div className="bg-gray-900/60 backdrop-blur-md border border-gray-700/80 rounded-2xl p-8 shadow-xl relative overflow-hidden">
             {/* Ambient soft glow inside bio */}
             <div className="absolute -top-10 -right-10 w-36 h-36 bg-orange-500/5 rounded-full blur-3xl pointer-events-none"></div>
             
-            <p className="text-gray-300 text-base md:text-lg leading-relaxed mb-4">
+            <p style={{ color: 'inherit' }} className="text-gray-200 text-base md:text-lg leading-relaxed mb-4">
               Hello! I'm <strong className="text-orange-400 font-semibold">Pranish Shakya</strong>, a tech enthusiast with a growing interest in modern web development and software solutions.
             </p>
-            <p className="text-gray-400 text-sm md:text-base leading-relaxed">
+            <p style={{ color: 'inherit' }} className="text-gray-300 text-sm md:text-base leading-relaxed">
               I enjoy designing responsive frontends, building secure databases, and resolving complex problems through code. My current stack revolves around the React ecosystem and ASP.NET Core, with a commitment to delivering clean, user-friendly, and accessible interfaces.
             </p>
           </div>
