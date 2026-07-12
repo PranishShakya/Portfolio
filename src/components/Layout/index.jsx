@@ -31,7 +31,7 @@ const MainLayout = () => {
             <BurnEffect />
           </>
         )}
-        <CustomCursor />
+        <CustomCursor theme={theme} />
         <Header />
         <Outlet context={{ theme, setTheme }} />
         <AdminPanel />
