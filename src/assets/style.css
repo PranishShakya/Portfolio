@@ -46,4 +46,113 @@ html,body{
     cursor: none !important;
   }
 }
+
+/* Light mode overrides */
+body.light {
+  background-color: #94a3b8; /* Cool slaty grey-blue representing stormy sky */
+  color: #0f172a; /* Slate 900 */
+  
+  /* Override Tailwind v4 color variables */
+  --color-white: #0f172a;
+  --color-gray-300: #1e293b;
+  --color-gray-400: #334155;
+  --color-gray-500: #475569;
+  --color-gray-900: #ffffff;
+  --color-orange-400: #ea580c;
+  --color-orange-500: #ea580c;
+}
+
+/* Light mode typography overrides */
+body.light .text-white,
+body.light h1,
+body.light h2,
+body.light h3,
+body.light h4,
+body.light h5,
+body.light h6 {
+  color: #0f172a !important;
+}
+
+body.light p {
+  color: #1e293b !important;
+}
+
+body.light .text-gray-300,
+body.light .text-gray-400 {
+  color: #1e293b !important; /* slate-800 for readability */
+}
+
+body.light .text-gray-500 {
+  color: #334155 !important; /* slate-700 */
+}
+
+/* Glassmorphism adjustments for light mode cards */
+body.light .bg-gray-900\/60,
+body.light .bg-gray-900\/40,
+body.light .bg-gray-900\/30,
+body.light .bg-gray-900\/20,
+body.light .bg-gray-950\/20 {
+  background-color: rgba(255, 255, 255, 0.45) !important;
+  border-color: rgba(148, 163, 184, 0.3) !important;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08) !important;
+}
+
+/* Card title colors in light mode */
+body.light .text-orange-500,
+body.light .text-orange-400 {
+  color: #ea580c !important; /* slightly darker premium orange for contrast */
+}
+
+/* Border overrides in light mode */
+body.light .border-gray-800,
+body.light .border-gray-850,
+body.light .border-gray-800\/80 {
+  border-color: rgba(15, 23, 42, 0.1) !important;
+}
+
+/* Header customization in light mode */
+body.light header {
+  background-color: rgba(255, 255, 255, 0.7) !important;
+  border-color: rgba(234, 88, 12, 0.1) !important;
+}
+
+body.light header .text-gray-300 {
+  color: #334155 !important;
+}
+
+body.light header .text-gray-300:hover {
+  color: #ea580c !important;
+}
+
+body.light header button {
+  color: #0f172a !important;
+}
+
+/* Button overrides in light mode */
+body.light .border-gray-600 {
+  border-color: #475569 !important;
+  color: #1e293b !important;
+}
+
+body.light .border-gray-600:hover {
+  color: #ea580c !important;
+  border-color: #ea580c !important;
+}
+
+/* ParticleBackground and general background floating overlays */
+body.light .bg-orange-500\/10,
+body.light .bg-orange-600\/5,
+body.light .bg-orange-500\/5,
+body.light .bg-orange-600\/8 {
+  background-color: rgba(234, 88, 12, 0.08) !important;
+  mix-blend-mode: multiply;
+}
+
+/* Custom cursor in light mode */
+body.light .custom-cursor-dot {
+  background-color: #ea580c !important;
+}
+body.light .custom-cursor-ring {
+  border-color: #ea580c !important;
+}
 

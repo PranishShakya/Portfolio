@@ -1,12 +1,16 @@
 import React from "react";
+import { useOutletContext } from "react-router";
 import BodyTitle from "../../components/SectionTitle";
 import AboutPage from "../../components/About";
 import Projects from "../../components/Projects";
 import Contact from "../../components/Contact";
+import ThemeToggler from "../../components/ThemeToggler";
 
 const HomePage = () => {
+  const { theme, setTheme } = useOutletContext();
+
   return (
-    <div className="min-h-screen scroll-smooth text-white bg-grid-pattern relative overflow-hidden">
+    <div className="min-h-screen scroll-smooth text-white bg-grid-pattern relative overflow-hidden transition-colors duration-500">
       
       {/* Background Graphic Accents (Floating Glow Blobs) */}
       <div className="absolute top-[10%] left-[-15%] w-72 h-72 md:w-[450px] md:h-[450px] rounded-full bg-orange-500/10 blur-[90px] md:blur-[140px] pointer-events-none -z-10 animate-float"></div>
@@ -32,6 +36,11 @@ const HomePage = () => {
        {/* Contact Section */}
       <section id="contact" className="min-h-screen flex flex-col justify-start items-center scroll-mt-20 pt-28 pb-20 relative bg-gray-950/20">
         <Contact />
+      </section>
+
+      {/* Theme Atmosphere Control Section */}
+      <section id="theme-control" className="py-20 flex flex-col justify-center items-center relative border-t border-gray-900 bg-gray-950/40 px-6">
+        <ThemeToggler theme={theme} setTheme={setTheme} />
       </section>
     </div>
   );

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 // Picture radius = 190px (380px / 2)
 // All orbitSize values must be > 190 so planets stay OUTSIDE the picture
@@ -63,7 +63,23 @@ const planets = [
 // Outer container must be at least 2 × largest orbitSize = 824px
 const CONTAINER = 860;
 
-const Picture = () => {
+const Picture = ({ onHoverChange }) => {
+  const [isHovered, setIsHovered] = useState(false);
+
+  // Generate randomized details for 18 solar flares
+  const flares = React.useMemo(() => {
+    const FLARE_COUNT = 18;
+    return Array.from({ length: FLARE_COUNT }, (_, i) => {
+      const angle = (i * 360) / FLARE_COUNT + (Math.random() * 8 - 4);
+      const duration = 0.6 + Math.random() * 0.6;
+      const delay = Math.random() * -1.5;
+      const scaleX = 0.6 + Math.random() * 0.6;
+      const scaleY = 0.8 + Math.random() * 0.7;
+      const hue = 12 + Math.random() * 26; // Red-orange (12) to golden-yellow (38)
+      return { angle, duration, delay, scaleX, scaleY, hue };
+    });
+  }, []);
+
   return (
     <div
       className="relative flex items-center justify-center"
@@ -143,19 +159,67 @@ const Picture = () => {
 
       {/* ── Profile Picture ────────────────────────────────────── */}
       <div
-        className="relative z-10 flex items-center justify-center"
+        className="relative z-10 flex items-center justify-center cursor-pointer"
         style={{ width: "380px", height: "380px" }}
+        onMouseEnter={() => {
+          setIsHovered(true);
+          if (onHoverChange) onHoverChange(true);
+        }}
+        onMouseLeave={() => {
+          setIsHovered(false);
+          if (onHoverChange) onHoverChange(false);
+        }}
       >
+        {/* Solar Flares layer - wrapper with opacity transition */}
+        <div
+          className="absolute inset-0 pointer-events-none transition-opacity duration-300"
+          style={{ opacity: isHovered ? 1 : 0, zIndex: 5 }}
+        >
+          {flares.map((f, idx) => (
+            <div
+              key={idx}
+              className="absolute"
+              style={{
+                top: "50%",
+                left: "50%",
+                width: "0px",
+                height: "0px",
+                transform: `rotate(${f.angle}deg)`,
+              }}
+            >
+              <div
+                style={{
+                  position: "absolute",
+                  bottom: "185px", // sitting exactly at the edge of the circular ring
+                  left: "-16px",
+                  width: "32px",
+                  height: "90px",
+                  background: `linear-gradient(to top, hsla(${f.hue}, 100%, 55%, 0.95), hsla(${f.hue + 15}, 100%, 50%, 0.65), transparent)`,
+                  clipPath: "polygon(50% 0%, 25% 45%, 0% 100%, 100% 100%, 75% 45%)",
+                  filter: "blur(3px)",
+                  mixBlendMode: "screen",
+                  transformOrigin: "bottom center",
+                  animation: isHovered ? `solar-flare-burst ${f.duration}s ease-in-out infinite` : "none",
+                  animationDelay: `${f.delay}s`,
+                  "--scale-x": f.scaleX,
+                  "--scale-y": f.scaleY,
+                }}
+              />
+            </div>
+          ))}
+        </div>
+
         {/* Large outer glow ring — pulsing */}
         <div
-          className="absolute rounded-full animate-pulse"
+          className="absolute rounded-full transition-all duration-500"
           style={{
-            inset: "-6px",
+            inset: isHovered ? "-12px" : "-6px",
             border: "4px solid #f97316",
-            boxShadow:
-              "0 0 50px 18px rgba(255,150,0,0.45), " +
-              "0 0 90px 30px rgba(255,120,0,0.2), " +
-              "inset 0 0 40px 10px rgba(255,150,0,0.35)",
+            boxShadow: isHovered
+              ? "0 0 70px 25px rgba(255,100,0,0.7), 0 0 120px 45px rgba(255,50,0,0.4), inset 0 0 50px 15px rgba(255,150,0,0.5)"
+              : "0 0 50px 18px rgba(255,150,0,0.45), 0 0 90px 30px rgba(255,120,0,0.2), inset 0 0 40px 10px rgba(255,150,0,0.35)",
+            transform: isHovered ? "scale(1.03)" : "scale(1)",
+            animation: isHovered ? "none" : "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
           }}
         />
 
@@ -181,12 +245,14 @@ const Picture = () => {
 
         {/* Portrait image */}
         <div
-          className="relative rounded-full overflow-hidden bg-gray-900"
+          className="relative rounded-full overflow-hidden bg-gray-900 transition-all duration-300"
           style={{
             width: "374px",
             height: "374px",
-            border: "3px solid rgba(249,115,22,0.4)",
+            border: isHovered ? "3px solid #f97316" : "3px solid rgba(249,115,22,0.4)",
             zIndex: 10,
+            animation: isHovered ? "vibrate 0.15s linear infinite" : "none",
+            boxShadow: isHovered ? "0 0 40px rgba(249,115,22,0.6)" : "none",
           }}
         >
           <img
@@ -208,6 +274,35 @@ const Picture = () => {
         @keyframes orbit-spin-reverse {
           from { transform: translateX(-50%) rotate(0deg); }
           to   { transform: translateX(-50%) rotate(-360deg); }
+        }
+        @keyframes solar-flare-burst {
+          0% {
+            transform: scaleY(0.2) scaleX(var(--scale-x)) translateY(0);
+            opacity: 0;
+          }
+          25% {
+            opacity: 0.95;
+          }
+          60% {
+            opacity: 0.8;
+          }
+          100% {
+            transform: scaleY(var(--scale-y)) scaleX(calc(var(--scale-x) * 0.3)) translateY(-40px);
+            opacity: 0;
+          }
+        }
+        @keyframes vibrate {
+          0% { transform: translate(0, 0) rotate(0deg); }
+          10% { transform: translate(-2px, 1px) rotate(-0.5deg); }
+          20% { transform: translate(1px, -1px) rotate(0.5deg); }
+          30% { transform: translate(-1px, 2px) rotate(0deg); }
+          40% { transform: translate(2px, 1px) rotate(0.5deg); }
+          50% { transform: translate(-2px, -1px) rotate(-0.5deg); }
+          60% { transform: translate(1px, 2px) rotate(0deg); }
+          70% { transform: translate(-1px, -1px) rotate(0.5deg); }
+          80% { transform: translate(2px, -2px) rotate(-0.5deg); }
+          90% { transform: translate(-2px, 2px) rotate(0deg); }
+          100% { transform: translate(0, 0) rotate(0deg); }
         }
       `}</style>
     </div>
