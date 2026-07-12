@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
+import { playThunderSound } from "../../utils/audio";
 
 const WeatherBackground = ({ activeTheme }) => {
   const [lightningTrigger, setLightningTrigger] = useState(false);
@@ -126,6 +127,7 @@ const WeatherBackground = ({ activeTheme }) => {
         transform: `scale(${0.6 + Math.random() * 0.9}) scaleX(${Math.random() > 0.5 ? 1 : -1})`,
       });
       setLightningTrigger(true);
+      playThunderSound();
 
       setTimeout(() => {
         setLightningTrigger(false);

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Picture from "../Pictures";
 import { subscribeToResume } from "../../utils/portfolioStorage";
+import { startSuctionSound, stopSuctionSound } from "../../utils/audio";
 
 const BodyTitle = () => {
   const [resumeUrl, setResumeUrl] = useState("CV.pdf");
@@ -21,6 +22,15 @@ const BodyTitle = () => {
 
     return () => unsubscribe();
   }, []);
+
+  useEffect(() => {
+    if (isPictureHovered) {
+      startSuctionSound();
+    } else {
+      stopSuctionSound();
+    }
+    return () => stopSuctionSound();
+  }, [isPictureHovered]);
 
   return (
     <div className="max-w-7xl mx-auto px-6 md:px-12 w-full pt-20 md:pt-24 pb-8">
