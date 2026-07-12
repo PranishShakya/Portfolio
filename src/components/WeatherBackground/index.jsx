@@ -129,6 +129,9 @@ const WeatherBackground = ({ activeTheme }) => {
       setLightningTrigger(true);
       playThunderSound();
 
+      // Broadcast lightning event so BurnEffect can react globally
+      window.dispatchEvent(new CustomEvent("lightning-strike"));
+
       setTimeout(() => {
         setLightningTrigger(false);
       }, 700);

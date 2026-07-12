@@ -6,6 +6,7 @@ import AdminPanel from '../AdminPanel'
 import ParticleBackground from '../ParticleBackground'
 import CustomCursor from '../CustomCursor'
 import WeatherBackground from '../WeatherBackground'
+import BurnEffect from '../BurnEffect'
 
 const MainLayout = () => {
   const [theme, setTheme] = useState(() => {
@@ -24,7 +25,12 @@ const MainLayout = () => {
 
   return (
     <>
-        {theme === "dark" ? <ParticleBackground /> : <WeatherBackground activeTheme={theme} />}
+        {theme === "dark" ? <ParticleBackground /> : (
+          <>
+            <WeatherBackground activeTheme={theme} />
+            <BurnEffect />
+          </>
+        )}
         <CustomCursor />
         <Header />
         <Outlet context={{ theme, setTheme }} />
