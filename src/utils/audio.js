@@ -120,43 +120,49 @@ export const playThunderSound = () => {
     // 2. Heavy lowpass filter to emulate thunder sound profile (deep & muffled)
     const lowpassFilter = ctx.createBiquadFilter();
     lowpassFilter.type = "lowpass";
-    lowpassFilter.frequency.setValueAtTime(240, now);
+    lowpassFilter.frequency.setValueAtTime(420, now);  // wider for more crispness on the strike
     lowpassFilter.Q.setValueAtTime(6, now);
 
-    // Muffle the frequency even further as the thunder travels/rolls away
-    lowpassFilter.frequency.exponentialRampToValueAtTime(40, now + 4.5);
+    // Muffle the frequency as the thunder travels/rolls away
+    lowpassFilter.frequency.exponentialRampToValueAtTime(55, now + 4.5);
 
-    // 3. Gain envelope for master levels (lightning clap + rolling decay)
+    // 3. Master gain amplifier — boosts the overall thunder loudness
+    const masterGain = ctx.createGain();
+    masterGain.gain.setValueAtTime(2.2, now); // 2.2× amplifier
+
+    // 4. Gain envelope for master levels (lightning clap + rolling decay)
     const envelope = ctx.createGain();
     envelope.gain.setValueAtTime(0.001, now);
 
-    // Lightning clap - immediate high amplitude peak
-    envelope.gain.linearRampToValueAtTime(0.38, now + 0.05); // sharp attack
-    envelope.gain.exponentialRampToValueAtTime(0.12, now + 0.4); // quick decay to rumble
+    // Lightning clap — powerful, immediate crack
+    envelope.gain.linearRampToValueAtTime(0.95, now + 0.04); // sharp, powerful crack
+    envelope.gain.exponentialRampToValueAtTime(0.35, now + 0.35); // decay to heavy rumble
 
     // Secondary rolling thunder surges (echoes bouncing off clouds)
-    envelope.gain.linearRampToValueAtTime(0.24, now + 0.8);
-    envelope.gain.exponentialRampToValueAtTime(0.06, now + 1.8);
-    envelope.gain.linearRampToValueAtTime(0.1, now + 2.3);
+    envelope.gain.linearRampToValueAtTime(0.65, now + 0.75);
+    envelope.gain.exponentialRampToValueAtTime(0.20, now + 1.8);
+    envelope.gain.linearRampToValueAtTime(0.38, now + 2.4);
     envelope.gain.exponentialRampToValueAtTime(0.001, now + 5.0); // complete fade
 
-    // 4. Low Sub-Bass oscillator to add heavy physical weight/rumble vibration
+    // 5. Low Sub-Bass oscillator — heavy physical weight/rumble vibration
     const subOsc = ctx.createOscillator();
     subOsc.type = "sine";
     subOsc.frequency.setValueAtTime(36, now); // 36 Hz sub-bass
 
     const subGain = ctx.createGain();
     subGain.gain.setValueAtTime(0.001, now);
-    subGain.gain.linearRampToValueAtTime(0.35, now + 0.08); // sub-clout
-    subGain.gain.exponentialRampToValueAtTime(0.001, now + 3.2); // fade out sooner than rumble
+    subGain.gain.linearRampToValueAtTime(0.70, now + 0.07); // stronger sub-clout
+    subGain.gain.exponentialRampToValueAtTime(0.001, now + 3.2); // fade out
 
-    // Wire up connections
+    // Wire up connections — route noise through masterGain for amplification
     noiseNode.connect(lowpassFilter);
     lowpassFilter.connect(envelope);
-    envelope.connect(ctx.destination);
+    envelope.connect(masterGain);
+    masterGain.connect(ctx.destination);
 
     subOsc.connect(subGain);
     subGain.connect(ctx.destination);
+
 
     // Start playing
     noiseNode.start(now);
