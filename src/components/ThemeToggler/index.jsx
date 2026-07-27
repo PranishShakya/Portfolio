@@ -1,5 +1,5 @@
 import React from "react";
-import { FaSun, FaMoon } from "react-icons/fa";
+import { FaSun, FaMoon, FaVolumeUp } from "react-icons/fa";
 
 const ThemeToggler = ({ theme, setTheme }) => {
   const toggleTheme = () => {
@@ -17,6 +17,17 @@ const ThemeToggler = ({ theme, setTheme }) => {
           : "Currently experiencing the light theme storm with floating clouds and lightning. Switch back for dark mode calm."
         }
       </p>
+
+      {/* Sound Warning Banner for Light Theme */}
+      {theme === "light" && (
+        <div className="mb-6 p-4 bg-amber-500/10 border border-amber-500/30 rounded-xl text-amber-300 text-xs md:text-sm flex items-start md:items-center gap-3 text-left shadow-inner animate-fade-in">
+          <FaVolumeUp className="text-amber-400 text-lg shrink-0 mt-0.5 md:mt-0 animate-pulse" />
+          <div>
+            <span className="font-semibold text-amber-200 block md:inline mr-1">⚠️ Sound Warning:</span>
+            Light theme features dynamic thunder and lightning audio effects. Please ensure your audio volume is set to a comfortable level!
+          </div>
+        </div>
+      )}
       
       <div className="flex justify-center items-center">
         <button

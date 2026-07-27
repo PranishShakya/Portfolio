@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useMemo } from "react";
+import { FaVolumeUp, FaTimes } from "react-icons/fa";
 import { playThunderSound } from "../../utils/audio";
 
 const WeatherBackground = ({ activeTheme }) => {
   const [lightningTrigger, setLightningTrigger] = useState(false);
   const [boltIndex, setBoltIndex] = useState(0);
   const [lightningStyle, setLightningStyle] = useState({});
+  const [showAudioWarning, setShowAudioWarning] = useState(true);
 
   // SVG Lightning Paths for realistic branching lightning
   const boltPaths = useMemo(() => [
@@ -274,6 +276,24 @@ const WeatherBackground = ({ activeTheme }) => {
         .animation-delay-\\[-30s\\] { animation-delay: -30s; }
         .animation-delay-\\[-40s\\] { animation-delay: -40s; }
       `}</style>
+
+      {/* Floating Sound Warning Badge / Toast for Light Theme */}
+      {showAudioWarning && (
+        <div className="fixed bottom-6 right-6 z-[9999] pointer-events-auto bg-gray-900/90 backdrop-blur-md text-amber-300 border border-amber-500/40 px-4 py-3 rounded-2xl text-xs md:text-sm flex items-center gap-3 shadow-2xl transition-all duration-300 max-w-xs md:max-w-sm">
+          <FaVolumeUp className="text-amber-400 text-lg shrink-0 animate-pulse" />
+          <div className="flex-1">
+            <span className="font-semibold text-amber-200 block">⚡ Sound Warning</span>
+            Light theme storm features live thunder sound synthesis.
+          </div>
+          <button
+            onClick={() => setShowAudioWarning(false)}
+            className="text-gray-400 hover:text-white p-1.5 transition-colors rounded-lg hover:bg-gray-800 focus:outline-none cursor-pointer"
+            aria-label="Dismiss warning"
+          >
+            <FaTimes size={14} />
+          </button>
+        </div>
+      )}
     </div>
   );
 };

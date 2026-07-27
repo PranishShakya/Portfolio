@@ -4,9 +4,9 @@ import {
 } from "react-icons/fa";
 import { saveResume, addProject, updateProject, resetPortfolio } from "../../utils/portfolioStorage";
 
-// ── Credentials (kept client-side only; not exposed as env) ─────────────────
-const ADMIN_USERNAME = "Pranish Shakya";
-const ADMIN_PASSWORD = "9845754168p@";
+// ── Credentials (loaded from environment variables to secure secrets in Git) ──
+const ADMIN_USERNAME = import.meta.env.VITE_ADMIN_USERNAME || "";
+const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || "";
 const AUTH_KEY       = "pranish_admin_authed";
 
 const AdminPanel = () => {
