@@ -35,32 +35,32 @@ const WeatherBackground = ({ activeTheme }) => {
         <path
           d="M 50 0 L 45 40 L 58 70 L 38 120 L 62 160 L 48 210 L 58 260 L 50 300"
           fill="none"
-          stroke="#e0f2fe"
-          strokeWidth="4"
+          stroke="#ffffff"
+          strokeWidth="6"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
         <path
           d="M 45 40 L 25 70 L 15 100"
           fill="none"
-          stroke="#bae6fd"
-          strokeWidth="2"
+          stroke="#00f0ff"
+          strokeWidth="3.5"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
         <path
           d="M 38 120 L 55 150 L 68 175"
           fill="none"
-          stroke="#bae6fd"
-          strokeWidth="2.5"
+          stroke="#38bdf8"
+          strokeWidth="3.5"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
         <path
           d="M 48 210 L 30 240 L 20 280"
           fill="none"
-          stroke="#bae6fd"
-          strokeWidth="1.8"
+          stroke="#7dd3fc"
+          strokeWidth="2.5"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
@@ -72,24 +72,24 @@ const WeatherBackground = ({ activeTheme }) => {
         <path
           d="M 40 0 L 50 50 L 35 100 L 60 150 L 42 200 L 55 250 L 38 300"
           fill="none"
-          stroke="#e0f2fe"
-          strokeWidth="4.5"
+          stroke="#ffffff"
+          strokeWidth="6.5"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
         <path
           d="M 50 50 L 70 85 L 85 110"
           fill="none"
-          stroke="#bae6fd"
-          strokeWidth="2"
+          stroke="#00f0ff"
+          strokeWidth="3.5"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
         <path
           d="M 60 150 L 40 185 L 30 230"
           fill="none"
-          stroke="#bae6fd"
-          strokeWidth="2.5"
+          stroke="#38bdf8"
+          strokeWidth="3.5"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
@@ -101,32 +101,32 @@ const WeatherBackground = ({ activeTheme }) => {
         <path
           d="M 50 0 L 55 35 L 42 80 L 65 130 L 48 180 L 58 230 L 50 300"
           fill="none"
-          stroke="#e0f2fe"
-          strokeWidth="4"
+          stroke="#ffffff"
+          strokeWidth="6"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
         <path
           d="M 55 35 L 75 60 L 85 90"
           fill="none"
-          stroke="#bae6fd"
-          strokeWidth="2"
+          stroke="#00f0ff"
+          strokeWidth="3.5"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
         <path
           d="M 42 80 L 20 120 L 10 160"
           fill="none"
-          stroke="#bae6fd"
-          strokeWidth="2.2"
+          stroke="#38bdf8"
+          strokeWidth="3.5"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
         <path
           d="M 48 180 L 65 210 L 78 245"
           fill="none"
-          stroke="#bae6fd"
-          strokeWidth="1.8"
+          stroke="#7dd3fc"
+          strokeWidth="2.5"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
@@ -134,18 +134,22 @@ const WeatherBackground = ({ activeTheme }) => {
     )
   ], []);
 
-  // Lightning timing trigger
+  // Lightning timing trigger loop
   useEffect(() => {
     if (activeTheme !== "light") return;
 
-    let timer;
-    const triggerLightning = () => {
+    let isMounted = true;
+    let nextTimeoutId = null;
+
+    const triggerStrike = () => {
+      if (!isMounted) return;
+
       const randomIdx = Math.floor(Math.random() * boltPaths.length);
       setBoltIndex(randomIdx);
       setLightningStyle({
-        left: `${15 + Math.random() * 70}%`,
-        top: `${-10 + Math.random() * 20}%`,
-        transform: `scale(${0.6 + Math.random() * 0.9}) scaleX(${Math.random() > 0.5 ? 1 : -1})`,
+        left: `${10 + Math.random() * 75}%`,
+        top: `${-5 + Math.random() * 15}%`,
+        transform: `scale(${0.85 + Math.random() * 0.65}) scaleX(${Math.random() > 0.5 ? 1 : -1})`,
       });
       setLightningTrigger(true);
       playThunderSound();
@@ -154,28 +158,21 @@ const WeatherBackground = ({ activeTheme }) => {
       window.dispatchEvent(new CustomEvent("lightning-strike"));
 
       setTimeout(() => {
-        setLightningTrigger(false);
+        if (isMounted) setLightningTrigger(false);
       }, 700);
+
+      // Schedule next strike in 3.5 to 7.5 seconds
+      const nextDelay = 3500 + Math.random() * 4000;
+      nextTimeoutId = setTimeout(triggerStrike, nextDelay);
     };
 
-    const scheduleNext = () => {
-      // Trigger a lightning strike every 3.5 to 8 seconds
-      const delay = 3500 + Math.random() * 4500;
-      timer = setTimeout(() => {
-        triggerLightning();
-        scheduleNext();
-      }, delay);
-    };
-
-    // Trigger an initial lightning strike shortly after switching to light mode
-    const initialTimer = setTimeout(() => {
-      triggerLightning();
-      scheduleNext();
-    }, 400);
+    // Initial lightning strike 200ms after switching to light mode
+    const initialId = setTimeout(triggerStrike, 200);
 
     return () => {
-      clearTimeout(timer);
-      clearTimeout(initialTimer);
+      isMounted = false;
+      clearTimeout(initialId);
+      if (nextTimeoutId) clearTimeout(nextTimeoutId);
     };
   }, [activeTheme, boltPaths]);
 
@@ -183,27 +180,29 @@ const WeatherBackground = ({ activeTheme }) => {
 
   return (
     <>
-      <div className="fixed inset-0 pointer-events-none z-[2] overflow-hidden">
-      {/* Dynamic Lightning Flash Screen Overlay */}
+      {/* Dynamic Screen Flash Overlay (in front of page sections) */}
       {lightningTrigger && (
-        <div className="absolute inset-0 bg-sky-100/90 mix-blend-overlay z-[2] animate-lightning-flash" />
+        <div className="fixed inset-0 pointer-events-none z-[44] bg-sky-200/50 mix-blend-overlay animate-lightning-flash" />
       )}
 
-      {/* Lightning Bolt SVG rendering */}
+      {/* High-Visibility Electric Lightning Bolt SVG (in front of page sections) */}
       {lightningTrigger && (
         <svg
-          className="absolute z-[3]"
+          className="fixed z-[45] pointer-events-none transition-all duration-75"
           style={{
             ...lightningStyle,
-            width: "220px",
-            height: "450px",
-            filter: "drop-shadow(0 0 15px rgba(224, 242, 254, 0.95)) drop-shadow(0 0 35px rgba(56, 189, 248, 0.6))",
+            width: "320px",
+            height: "580px",
+            filter: "drop-shadow(0 0 25px #00f0ff) drop-shadow(0 0 50px #ffffff) drop-shadow(0 0 80px #38bdf8)",
           }}
           viewBox="0 0 100 300"
         >
           {boltPaths[boltIndex]}
         </svg>
       )}
+
+      {/* Floating Stormy Clouds Background Container */}
+      <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden opacity-80">
 
       {/* Floating Clouds Container */}
       <div className="absolute inset-0 z-[1] opacity-70">
