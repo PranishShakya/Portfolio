@@ -5,8 +5,27 @@ import { playThunderSound } from "../../utils/audio";
 const WeatherBackground = ({ activeTheme }) => {
   const [lightningTrigger, setLightningTrigger] = useState(false);
   const [boltIndex, setBoltIndex] = useState(0);
-  const [lightningStyle, setLightningStyle] = useState({});
-  const [showAudioWarning, setShowAudioWarning] = useState(true);
+  const [showAudioWarning, setShowAudioWarning] = useState(false);
+
+  // Auto-dismiss floating warning popup after 5 seconds or if previously dismissed in session
+  useEffect(() => {
+    if (activeTheme !== "light") {
+      setShowAudioWarning(false);
+      return;
+    }
+
+    if (sessionStorage.getItem("light_theme_audio_warning_dismissed") === "true") {
+      setShowAudioWarning(false);
+      return;
+    }
+
+    setShowAudioWarning(true);
+    const autoDismissTimer = setTimeout(() => {
+      setShowAudioWarning(false);
+    }, 5000);
+
+    return () => clearTimeout(autoDismissTimer);
+  }, [activeTheme]);
 
   // SVG Lightning Paths for realistic branching lightning
   const boltPaths = useMemo(() => [
@@ -155,7 +174,8 @@ const WeatherBackground = ({ activeTheme }) => {
   if (activeTheme !== "light") return null;
 
   return (
-    <div className="fixed inset-0 pointer-events-none z-[2] overflow-hidden">
+    <>
+      <div className="fixed inset-0 pointer-events-none z-[2] overflow-hidden">
       {/* Dynamic Lightning Flash Screen Overlay */}
       {lightningTrigger && (
         <div className="absolute inset-0 bg-sky-100/90 mix-blend-overlay z-[2] animate-lightning-flash" />
@@ -276,17 +296,23 @@ const WeatherBackground = ({ activeTheme }) => {
         .animation-delay-\\[-30s\\] { animation-delay: -30s; }
         .animation-delay-\\[-40s\\] { animation-delay: -40s; }
       `}</style>
+      </div>
 
       {/* Floating Sound Warning Badge / Toast for Light Theme */}
       {showAudioWarning && (
-        <div className="fixed bottom-6 right-6 z-[9999] pointer-events-auto bg-gray-900/90 backdrop-blur-md text-amber-300 border border-amber-500/40 px-4 py-3 rounded-2xl text-xs md:text-sm flex items-center gap-3 shadow-2xl transition-all duration-300 max-w-xs md:max-w-sm">
+        <div className="fixed bottom-6 right-6 z-[99999] pointer-events-auto bg-gray-900/95 backdrop-blur-md text-amber-300 border border-amber-500/40 px-4 py-3 rounded-2xl text-xs md:text-sm flex items-center gap-3 shadow-2xl transition-all duration-300 max-w-xs md:max-w-sm">
           <FaVolumeUp className="text-amber-400 text-lg shrink-0 animate-pulse" />
           <div className="flex-1">
             <span className="font-semibold text-amber-200 block">⚡ Sound Warning</span>
             Light theme storm features live thunder sound synthesis.
           </div>
           <button
-            onClick={() => setShowAudioWarning(false)}
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              setShowAudioWarning(false);
+              sessionStorage.setItem("light_theme_audio_warning_dismissed", "true");
+            }}
             className="text-gray-400 hover:text-white p-1.5 transition-colors rounded-lg hover:bg-gray-800 focus:outline-none cursor-pointer"
             aria-label="Dismiss warning"
           >
@@ -294,7 +320,7 @@ const WeatherBackground = ({ activeTheme }) => {
           </button>
         </div>
       )}
-    </div>
+    </>
   );
 };
 
