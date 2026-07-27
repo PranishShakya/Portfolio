@@ -49,9 +49,9 @@ html,body{
 
 /* Light mode overrides */
 body.light {
-  background-color: #94a3b8; /* Cool slaty grey-blue representing stormy sky */
+  background-color: #f8fafc; /* Crisp white/light background */
   color: #0f172a; /* Slate 900 */
-  
+
   /* Override Tailwind v4 color variables */
   --color-white: #0f172a;
   --color-gray-300: #1e293b;
@@ -86,15 +86,51 @@ body.light .text-gray-500 {
   color: #334155 !important; /* slate-700 */
 }
 
-/* Glassmorphism adjustments for light mode cards */
+/* Glassmorphism & Panel adjustments for light mode cards, drawers & Portfolio Settings */
+body.light .bg-gray-950,
+body.light .bg-gray-900,
+body.light .bg-gray-900\/95,
+body.light .bg-gray-900\/80,
 body.light .bg-gray-900\/60,
+body.light .bg-gray-900\/50,
 body.light .bg-gray-900\/40,
 body.light .bg-gray-900\/30,
 body.light .bg-gray-900\/20,
-body.light .bg-gray-950\/20 {
-  background-color: rgba(255, 255, 255, 0.45) !important;
-  border-color: rgba(148, 163, 184, 0.3) !important;
+body.light .bg-gray-950\/40,
+body.light .bg-gray-950\/20,
+body.light .bg-black\/95,
+body.light .bg-black\/90,
+body.light .bg-black\/70,
+body.light .bg-black\/40 {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #e2e8f0 !important;
   box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08) !important;
+}
+
+/* Form inputs & textareas in light mode (e.g., Settings admin panel) */
+body.light input[type="text"],
+body.light input[type="password"],
+body.light input[type="url"],
+body.light input[type="email"],
+body.light textarea,
+body.light select {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+body.light input::placeholder,
+body.light textarea::placeholder {
+  color: #64748b !important;
+}
+
+/* Section borders & subtle dividers in light mode */
+body.light .border-gray-900,
+body.light .border-gray-800,
+body.light .border-gray-850,
+body.light .border-gray-800\/80 {
+  border-color: #e2e8f0 !important;
 }
 
 /* Card title colors in light mode */
@@ -103,17 +139,10 @@ body.light .text-orange-400 {
   color: #ea580c !important; /* slightly darker premium orange for contrast */
 }
 
-/* Border overrides in light mode */
-body.light .border-gray-800,
-body.light .border-gray-850,
-body.light .border-gray-800\/80 {
-  border-color: rgba(15, 23, 42, 0.1) !important;
-}
-
 /* Header customization in light mode */
 body.light header {
-  background-color: rgba(255, 255, 255, 0.7) !important;
-  border-color: rgba(234, 88, 12, 0.1) !important;
+  background-color: rgba(255, 255, 255, 0.85) !important;
+  border-color: rgba(234, 88, 12, 0.15) !important;
 }
 
 body.light header .text-gray-300 {
@@ -139,7 +168,7 @@ body.light .border-gray-600:hover {
   border-color: #ea580c !important;
 }
 
-/* ParticleBackground and general background floating overlays */
+/* Floating background glow accents in light mode */
 body.light .bg-orange-500\/10,
 body.light .bg-orange-600\/5,
 body.light .bg-orange-500\/5,

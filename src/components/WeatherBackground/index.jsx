@@ -6,6 +6,7 @@ const WeatherBackground = ({ activeTheme }) => {
   const [lightningTrigger, setLightningTrigger] = useState(false);
   const [boltIndex, setBoltIndex] = useState(0);
   const [showAudioWarning, setShowAudioWarning] = useState(false);
+  const [lightningStyle, setLightningStyle] = useState({});
 
   // Auto-dismiss floating warning popup after 5 seconds or if previously dismissed in session
   useEffect(() => {
@@ -134,7 +135,7 @@ const WeatherBackground = ({ activeTheme }) => {
     )
   ], []);
 
-  // Lightning timing trigger loop
+  // Lightning timing trigger loop (every 3 seconds)
   useEffect(() => {
     if (activeTheme !== "light") return;
 
@@ -175,9 +176,8 @@ const WeatherBackground = ({ activeTheme }) => {
         if (isMounted) setLightningTrigger(false);
       }, 700);
 
-      // Schedule next strike in 3.5 to 7.5 seconds
-      const nextDelay = 3500 + Math.random() * 4000;
-      nextTimeoutId = setTimeout(triggerStrike, nextDelay);
+      // Schedule next strike in exactly 3 seconds (3000ms)
+      nextTimeoutId = setTimeout(triggerStrike, 3000);
     };
 
     // Initial lightning strike 200ms after switching to light mode
