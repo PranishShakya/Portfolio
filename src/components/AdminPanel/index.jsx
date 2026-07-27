@@ -4,9 +4,9 @@ import {
 } from "react-icons/fa";
 import { saveResume, addProject, updateProject, resetPortfolio } from "../../utils/portfolioStorage";
 
-// ── Credentials (loaded from environment variables to secure secrets in Git) ──
-const ADMIN_USERNAME = import.meta.env.VITE_ADMIN_USERNAME || "";
-const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || "";
+// ── Credentials (loaded from environment variables with working fallbacks) ──
+const ADMIN_USERNAME = (import.meta.env.VITE_ADMIN_USERNAME || "Pranish Shakya").trim();
+const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || "9845754168p@";
 const AUTH_KEY       = "pranish_admin_authed";
 
 const AdminPanel = () => {
@@ -81,7 +81,13 @@ const AdminPanel = () => {
 
   const handleLogin = (e) => {
     e.preventDefault();
-    if (loginUser === ADMIN_USERNAME && loginPass === ADMIN_PASSWORD) {
+    const inputUser = loginUser.trim();
+    const inputPass = loginPass.trim();
+
+    if (
+      (inputUser.toLowerCase() === ADMIN_USERNAME.toLowerCase()) &&
+      (inputPass === ADMIN_PASSWORD || inputPass === ADMIN_PASSWORD.trim())
+    ) {
       sessionStorage.setItem(AUTH_KEY, "true");
       setIsAuthed(true);
       setShowLogin(false);
