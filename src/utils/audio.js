@@ -104,6 +104,9 @@ export const playThunderSound = () => {
     if (!AudioContext) return;
 
     const ctx = new AudioContext();
+    if (ctx.state === "suspended") {
+      ctx.resume().catch(() => {});
+    }
     const now = ctx.currentTime;
 
     // 1. White Noise generator for atmospheric rain/thunder rumble

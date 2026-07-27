@@ -159,16 +159,24 @@ const WeatherBackground = ({ activeTheme }) => {
     };
 
     const scheduleNext = () => {
-      // Trigger a lightning strike every 5 to 11 seconds
-      const delay = 5000 + Math.random() * 6000;
+      // Trigger a lightning strike every 3.5 to 8 seconds
+      const delay = 3500 + Math.random() * 4500;
       timer = setTimeout(() => {
         triggerLightning();
         scheduleNext();
       }, delay);
     };
 
-    scheduleNext();
-    return () => clearTimeout(timer);
+    // Trigger an initial lightning strike shortly after switching to light mode
+    const initialTimer = setTimeout(() => {
+      triggerLightning();
+      scheduleNext();
+    }, 400);
+
+    return () => {
+      clearTimeout(timer);
+      clearTimeout(initialTimer);
+    };
   }, [activeTheme, boltPaths]);
 
   if (activeTheme !== "light") return null;

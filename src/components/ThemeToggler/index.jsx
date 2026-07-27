@@ -1,9 +1,16 @@
 import React from "react";
 import { FaSun, FaMoon, FaVolumeUp } from "react-icons/fa";
+import { playThunderSound } from "../../utils/audio";
 
 const ThemeToggler = ({ theme, setTheme }) => {
   const toggleTheme = () => {
-    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
+    setTheme((prev) => {
+      const nextTheme = prev === "dark" ? "light" : "dark";
+      if (nextTheme === "light") {
+        playThunderSound();
+      }
+      return nextTheme;
+    });
   };
 
   return (
