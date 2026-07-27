@@ -146,16 +146,30 @@ const WeatherBackground = ({ activeTheme }) => {
 
       const randomIdx = Math.floor(Math.random() * boltPaths.length);
       setBoltIndex(randomIdx);
+
+      // Random position for this strike
+      const strikeLeft  = 10 + Math.random() * 75;   // % across viewport
+      const strikeTop   = -5 + Math.random() * 15;   // % from top (bolt starts above)
+      const strikeScale = 0.85 + Math.random() * 0.65;
+      const strikeFlip  = Math.random() > 0.5 ? 1 : -1;
+
       setLightningStyle({
-        left: `${10 + Math.random() * 75}%`,
-        top: `${-5 + Math.random() * 15}%`,
-        transform: `scale(${0.85 + Math.random() * 0.65}) scaleX(${Math.random() > 0.5 ? 1 : -1})`,
+        left: `${strikeLeft}%`,
+        top:  `${strikeTop}%`,
+        transform: `scale(${strikeScale}) scaleX(${strikeFlip})`,
       });
       setLightningTrigger(true);
       playThunderSound();
 
-      // Broadcast lightning event so BurnEffect can react globally
-      window.dispatchEvent(new CustomEvent("lightning-strike"));
+      // Broadcast lightning event with position so BurnEffect erupts fire at the bolt's ground impact
+      const boltWidthPx  = 360 * strikeScale;
+      const boltHeightPx = 640 * strikeScale;
+      const impactX = (strikeLeft / 100) * window.innerWidth + (strikeFlip > 0 ? boltWidthPx * 0.5 : boltWidthPx * 0.5);
+      const impactY = Math.max(0, (strikeTop / 100) * window.innerHeight + boltHeightPx * 0.85);
+
+      window.dispatchEvent(new CustomEvent("lightning-strike", {
+        detail: { x: impactX, y: impactY }
+      }));
 
       setTimeout(() => {
         if (isMounted) setLightningTrigger(false);
