@@ -180,20 +180,20 @@ const WeatherBackground = ({ activeTheme }) => {
 
   return (
     <>
-      {/* Dynamic Screen Flash Overlay (in front of page sections) */}
+      {/* Dynamic Screen Flash Overlay (in front of page content) */}
       {lightningTrigger && (
-        <div className="fixed inset-0 pointer-events-none z-[44] bg-sky-200/50 mix-blend-overlay animate-lightning-flash" />
+        <div className="fixed inset-0 pointer-events-none z-[44] bg-white/80 animate-lightning-flash" />
       )}
 
-      {/* High-Visibility Electric Lightning Bolt SVG (in front of page sections) */}
+      {/* High-Visibility Electric Lightning Bolt SVG (in front of page content) */}
       {lightningTrigger && (
         <svg
           className="fixed z-[45] pointer-events-none transition-all duration-75"
           style={{
             ...lightningStyle,
-            width: "320px",
-            height: "580px",
-            filter: "drop-shadow(0 0 25px #00f0ff) drop-shadow(0 0 50px #ffffff) drop-shadow(0 0 80px #38bdf8)",
+            width: "360px",
+            height: "640px",
+            filter: "drop-shadow(0 0 30px #00f0ff) drop-shadow(0 0 60px #ffffff) drop-shadow(0 0 90px #38bdf8)",
           }}
           viewBox="0 0 100 300"
         >
@@ -201,25 +201,47 @@ const WeatherBackground = ({ activeTheme }) => {
         </svg>
       )}
 
-      {/* Floating Stormy Clouds Background Container */}
-      <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden opacity-80">
+      {/* Continuous Animated Rain Drops Container (z-10 layer) */}
+      <div className="fixed inset-0 pointer-events-none z-[10] overflow-hidden">
+        {Array.from({ length: 45 }).map((_, i) => {
+          const left = `${(i * 2.2 + (i % 7) * 3) % 100}%`;
+          const duration = `${0.6 + (i % 5) * 0.18}s`;
+          const delay = `-${(i % 10) * 0.15}s`;
+          const opacity = 0.5 + (i % 4) * 0.15;
+          const height = `${35 + (i % 6) * 8}px`;
 
-      {/* Floating Clouds Container */}
-      <div className="absolute inset-0 z-[1] opacity-70">
+          return (
+            <div
+              key={i}
+              className="rain-drop"
+              style={{
+                left,
+                height,
+                opacity,
+                animationDuration: duration,
+                animationDelay: delay,
+              }}
+            />
+          );
+        })}
+      </div>
+
+      {/* Floating Stormy Clouds Background Container (z-1 layer) */}
+      <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden opacity-90">
         {[
-          { id: 1, top: "8%", size: "scale-100", speed: "animation-duration-[55s]", delay: "animation-delay-[-10s]" },
-          { id: 2, top: "25%", size: "scale-75 opacity-80", speed: "animation-duration-[75s]", delay: "animation-delay-[-25s]" },
-          { id: 3, top: "45%", size: "scale-125 opacity-90", speed: "animation-duration-[45s]", delay: "animation-delay-[-5s]" },
-          { id: 4, top: "62%", size: "scale-90 opacity-75", speed: "animation-duration-[65s]", delay: "animation-delay-[-40s]" },
-          { id: 5, top: "78%", size: "scale-110", speed: "animation-duration-[50s]", delay: "animation-delay-[-15s]" },
-          { id: 6, top: "90%", size: "scale-80 opacity-60", speed: "animation-duration-[80s]", delay: "animation-delay-[-30s]" },
+          { id: 1, top: "4%", size: "scale-110", speed: "animation-duration-[40s]", delay: "animation-delay-[-5s]" },
+          { id: 2, top: "18%", size: "scale-90 opacity-90", speed: "animation-duration-[55s]", delay: "animation-delay-[-20s]" },
+          { id: 3, top: "35%", size: "scale-125 opacity-95", speed: "animation-duration-[35s]", delay: "animation-delay-[-2s]" },
+          { id: 4, top: "52%", size: "scale-100 opacity-85", speed: "animation-duration-[50s]", delay: "animation-delay-[-30s]" },
+          { id: 5, top: "70%", size: "scale-115 opacity-90", speed: "animation-duration-[42s]", delay: "animation-delay-[-12s]" },
+          { id: 6, top: "85%", size: "scale-85 opacity-75", speed: "animation-duration-[60s]", delay: "animation-delay-[-25s]" },
         ].map((c) => (
           <div
             key={c.id}
             className={`absolute left-0 w-0 h-0 animate-cloud-move ${c.speed} ${c.delay}`}
             style={{ top: c.top }}
           >
-            <div className={`relative ${c.size} opacity-90`}>
+            <div className={`relative ${c.size}`}>
               <div className="cloud" />
             </div>
           </div>
@@ -227,46 +249,72 @@ const WeatherBackground = ({ activeTheme }) => {
       </div>
 
       <style>{`
-        /* Cloud Drawing via CSS shapes */
+        /* Continuous Falling Rain Drops */
+        @keyframes rain-fall {
+          0% {
+            transform: translateY(-80px);
+            opacity: 0;
+          }
+          15% {
+            opacity: 0.85;
+          }
+          85% {
+            opacity: 0.85;
+          }
+          100% {
+            transform: translateY(105vh);
+            opacity: 0;
+          }
+        }
+
+        .rain-drop {
+          position: absolute;
+          top: 0;
+          width: 2px;
+          background: linear-gradient(to bottom, transparent, rgba(56, 189, 248, 0.8), rgba(255, 255, 255, 0.95));
+          animation: rain-fall linear infinite;
+        }
+
+        /* Dark Storm Cloud Drawing via CSS shapes */
         .cloud {
-          width: 380px;
-          height: 120px;
-          background: linear-gradient(to bottom, #cbd5e1, #94a3b8); /* dark stormy cloud gradient */
+          width: 440px;
+          height: 140px;
+          background: linear-gradient(to bottom, #334155, #1e293b); /* dark stormy cloud gradient */
           border-radius: 100px;
           position: absolute;
-          filter: blur(12px);
+          filter: blur(6px);
           box-shadow: 
-            inset -20px -15px 40px rgba(15, 23, 42, 0.2),
-            0 25px 35px rgba(15, 23, 42, 0.15);
+            inset -20px -15px 40px rgba(15, 23, 42, 0.5),
+            0 25px 45px rgba(15, 23, 42, 0.35);
         }
         .cloud::before {
           content: '';
           position: absolute;
-          background: #cbd5e1;
-          width: 180px;
-          height: 180px;
-          top: -90px;
-          left: 50px;
+          background: #475569;
+          width: 200px;
+          height: 200px;
+          top: -95px;
+          left: 55px;
           border-radius: 50%;
         }
         .cloud::after {
           content: '';
           position: absolute;
-          background: #94a3b8;
-          width: 140px;
-          height: 140px;
-          top: -70px;
-          right: 50px;
+          background: #334155;
+          width: 160px;
+          height: 160px;
+          top: -75px;
+          right: 55px;
           border-radius: 50%;
         }
 
         /* Animation: Cloud float from left boundary to right boundary */
         @keyframes cloud-move {
           0% {
-            transform: translateX(-400px);
+            transform: translateX(-450px);
           }
           100% {
-            transform: translateX(calc(100vw + 400px));
+            transform: translateX(calc(100vw + 450px));
           }
         }
         
@@ -279,31 +327,30 @@ const WeatherBackground = ({ activeTheme }) => {
         /* Lightning Double Flash Animation */
         @keyframes flash-lightning {
           0%, 100% { opacity: 0; }
-          12%, 35% { opacity: 1; }
-          20% { opacity: 0.25; }
-          45% { opacity: 0.1; }
+          10%, 40% { opacity: 0.85; }
+          22% { opacity: 0.15; }
+          50% { opacity: 0.05; }
         }
         
         .animate-lightning-flash {
-          animation: flash-lightning 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+          animation: flash-lightning 0.65s cubic-bezier(0.25, 1, 0.5, 1) forwards;
         }
 
         /* Tailwind custom utilities for arbitrary durations/delays */
-        .animation-duration-\\[45s\\] { animation-duration: 45s; }
+        .animation-duration-\\[35s\\] { animation-duration: 35s; }
+        .animation-duration-\\[40s\\] { animation-duration: 40s; }
+        .animation-duration-\\[42s\\] { animation-duration: 42s; }
         .animation-duration-\\[50s\\] { animation-duration: 50s; }
         .animation-duration-\\[55s\\] { animation-duration: 55s; }
-        .animation-duration-\\[65s\\] { animation-duration: 65s; }
-        .animation-duration-\\[75s\\] { animation-duration: 75s; }
-        .animation-duration-\\[80s\\] { animation-duration: 80s; }
+        .animation-duration-\\[60s\\] { animation-duration: 60s; }
         
+        .animation-delay-\\[-2s\\] { animation-delay: -2s; }
         .animation-delay-\\[-5s\\] { animation-delay: -5s; }
-        .animation-delay-\\[-10s\\] { animation-delay: -10s; }
-        .animation-delay-\\[-15s\\] { animation-delay: -15s; }
+        .animation-delay-\\[-12s\\] { animation-delay: -12s; }
+        .animation-delay-\\[-20s\\] { animation-delay: -20s; }
         .animation-delay-\\[-25s\\] { animation-delay: -25s; }
         .animation-delay-\\[-30s\\] { animation-delay: -30s; }
-        .animation-delay-\\[-40s\\] { animation-delay: -40s; }
       `}</style>
-      </div>
 
       {/* Floating Sound Warning Badge / Toast for Light Theme */}
       {showAudioWarning && (
